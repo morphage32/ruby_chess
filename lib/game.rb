@@ -7,6 +7,7 @@ require_relative "pawn.rb"
 
 class Game
   attr_reader :board
+
   def initialize()
     @board = [[Rook.new("black"),Knight.new("black"),Bishop.new("black"),Queen.new("black"),
               King.new("black"),Bishop.new("black"),Knight.new("black"),Rook.new("black")],
@@ -20,6 +21,24 @@ class Game
               Pawn.new("white"),Pawn.new("white"),Pawn.new("white"),Pawn.new("white")],
               [Rook.new("white"),Knight.new("white"),Bishop.new("white"),Queen.new("white"),
               King.new("white"),Bishop.new("white"),Knight.new("white"),Rook.new("white")]]
+    @test_board = []
+    @move_log = []
+  end
+
+  def build_test_board()
+    @test_board.clear
+    i = 0
+    j = 0
+    while i < 8 do
+      @test_board.push([])
+      while j < 8 do
+        @test_board[i].push(@board[i][j])
+        j += 1
+      end
+      i += 1
+      j = 0
+    end
+    return @test_board
   end
 
   def print_board()
@@ -63,5 +82,36 @@ class Game
       i += 1
     end
     puts "     1   2   3   4   5   6   7   8"
+  end
+
+  def update_all_moves()
+    i = 0
+    j = 0
+    while i < 8 do
+      while j < 8 do
+        if @board[i][j]
+          @board[i][j].update_moves(self, [i, j])
+        end
+        j += 1
+      end
+      i += 1
+      j = 0
+    end
+  end
+
+  def array_to_coords(array)
+    array[0] = (array[0] + 97).chr
+    array[1] = (array[1] + 49).chr
+    return array.join
+  end
+
+  def move_piece(start, finish, current_board = @board)
+    current_board[finish[0]][finish[1]] = current_board[start[0]][start[1]]
+    current_board[start[0]][finish[1]] = nil
+  end
+
+  def king_in_check?(color, current_board = @board)
+    # STUBBED
+    return false
   end
 end
