@@ -17,5 +17,7 @@ until playing == 'n' do
   player2 = Player.new(name, "black", current_game.board[0][4])
 
   current_game.print_board
+  current_game.update_all_moves
+  current_player = player1
   gets.chomp
 end
