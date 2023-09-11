@@ -7,6 +7,7 @@ require_relative "pawn.rb"
 
 class Game
   attr_reader :board
+  attr_accessor :player1, :player2
 
   def initialize()
     @board = [[Rook.new("black"),Knight.new("black"),Bishop.new("black"),Queen.new("black"),
@@ -23,6 +24,8 @@ class Game
               King.new("white"),Bishop.new("white"),Knight.new("white"),Rook.new("white")]]
     @test_board = []
     @move_log = []
+    @player1
+    @player2
   end
 
   def build_test_board()
@@ -105,13 +108,30 @@ class Game
     return array.join
   end
 
+  def coords_to_array(string)
+    return [] unless string.length == 2
+    array = string.split("")
+    array[0] = (array[0].ord - 97)
+    array[1] = (array[1].to_i - 1)
+    if array[0] >= 0 && array[0] >= 0 && array[1] < 8 && array[1] < 8
+      return array
+    else
+      return []
+    end
+  end
+
   def move_piece(start, finish, current_board = @board)
     current_board[finish[0]][finish[1]] = current_board[start[0]][start[1]]
-    current_board[start[0]][finish[1]] = nil
+    current_board[start[0]][start[1]] = nil
   end
 
   def king_in_check?(color, current_board = @board)
     # STUBBED
     return false
+  end
+
+  def endgame_check()
+    # STUBBED
+    return 0
   end
 end
