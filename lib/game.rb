@@ -125,8 +125,44 @@ class Game
     current_board[start[0]][start[1]] = nil
   end
 
-  def king_in_check?(color, current_board = @board)
-    # STUBBED
+  def king_in_check?(color, current_board = @board, custom_position = nil)
+    # assign king
+    if color == "white"
+      current_king = player1.king
+      i = -1
+    else
+      current_king = player2.king
+      i = 1
+    end
+
+    j = 1
+    if custom_position
+      y = custom_position[0]
+      x = custom_position[1]
+    else
+      y = current_king.position[0]
+      x = current_king.position[1]
+    end
+
+    # check for diagonal pawns threatening check
+    if y + i >= 0 && y + i < 8
+      if x - j >= 0 && x - j < 8
+        if current_board[y + i][x - j] && current_board[y + i][x - j].name == "Pawn" &&
+          current_board[y + i][x - j].color != color
+          return true
+        end
+      end
+      if x + j >= 0 && x + j < 8
+        if current_board[y + i][x + j] && current_board[y + i][x + j].name == "Pawn" &&
+          current_board[y + i][x + j].color != color
+          return true
+        end
+      end
+    end
+
+    all_moves = [[-1, 0],[1, 0],[0, -1],[0, 1],[-1, -1],[-1, 1],[1, 1],[1, -1],
+                [-2, -1],[-2, 1],[-1, 2],[1, 2],[2, 1],[2, -1],[1, -2],[-1, 2]]
+ 
     return false
   end
 
