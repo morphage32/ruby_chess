@@ -1,11 +1,10 @@
 class King
   attr_reader :name, :color, :symbol
-  attr_accessor :first_move, :possible_moves, :in_check, :position
+  attr_accessor :first_move, :possible_moves, :position
   def initialize(color)
     @name = "King"
     @color = color
     color == "white" ? (@symbol = "♚") : (@symbol = "♔")
-    @in_check = false
     @first_move = true
     @position
     @possible_moves = []
@@ -22,7 +21,7 @@ class King
       next if current_game.board[i][j] && current_game.board[i][j].color == @color
       test_board = current_game.build_test_board
       current_game.move_piece(position, [i, j], test_board)
-      unless current_game.king_in_check?(@color, test_board)
+      unless current_game.king_in_check?(@color, test_board, [i, j])
         @possible_moves.push(current_game.array_to_coords([i, j]))
       end
     end
