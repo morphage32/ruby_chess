@@ -40,7 +40,7 @@ class Pawn
         end
       else
         # add checks for en passant
-        next unless current_game.board[i][j] && current_game.board[i][j].color == @color
+        next unless current_game.board[i][j] && current_game.board[i][j].color != @color
         test_board = current_game.build_test_board
         current_game.move_piece(position, [i, j], test_board)
         unless current_game.king_in_check?(@color, test_board)
