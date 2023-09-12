@@ -248,12 +248,54 @@ class Game
       end
       a += 1
     end
-
     return false
   end
 
   def endgame_check()
-    # STUBBED
+    # Search for checkmate / stalemate
+    player = 1
+    until player > 2 do
+      i = 0
+      j = 0
+      no_moves = true
+      while i < 8 && no_moves do
+        while j < 8 do
+          if player == 1 && board[i][j] && board[i][j].color == "white"
+            if board[i][j].possible_moves.length > 0
+              no_moves = false
+              break
+            end
+          elsif player == 2 && board[i][j] && board[i][j].color == "black"
+            if board[i][j].possible_moves.length > 0
+              no_moves = false
+              break
+            end
+          end
+          j += 1
+        end
+        j = 0
+        i += 1
+      end
+      if no_moves
+        if player == 1
+          if king_in_check?("white")
+            return 2 # player 2 wins
+          end
+        else
+          if king_in_check?("black")
+            return 1 # player 1 wins
+          end
+        end
+        return 4 # stalemate
+      end
+      player += 1
+    end
+    
+  # endgames still needed:
+  # threefold-repetition (code 3)
+  # insufficient mating material (code 5)
+  # forfeit (code 11 or 22)
+
     return 0
   end
 end
