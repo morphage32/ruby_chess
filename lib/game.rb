@@ -7,7 +7,7 @@ require_relative "pawn.rb"
 
 class Game
   attr_reader :board
-  attr_accessor :player1, :player2
+  attr_accessor :move_log, :player1, :player2
 
   def initialize()
     @board = [[Rook.new("black"),Knight.new("black"),Bishop.new("black"),Queen.new("black"),
@@ -121,6 +121,16 @@ class Game
   end
 
   def move_piece(start, finish, current_board = @board)
+    # check for castling to move rook properly
+    if current_board[start[0]][start[1]].name == "King"
+      if finish[1] - 2 == start[1] || finish[1] + 2 == start[1]
+        if finish[1] == 2
+          move_piece([start[0], 0], [finish[0], 3], current_board)
+        else
+          move_piece([start[0], 7], [finish[0], 5], current_board)
+        end
+      end
+    end
     current_board[finish[0]][finish[1]] = current_board[start[0]][start[1]]
     current_board[start[0]][start[1]] = nil
   end
@@ -144,7 +154,7 @@ class Game
       x = current_king.position[1]
     end
 
-    # check for diagonal pawns threatening check
+    # look for diagonal pawns threatening check
     if y + i >= 0 && y + i < 8
       if x - j >= 0 && x - j < 8
         if current_board[y + i][x - j] && current_board[y + i][x - j].name == "Pawn" &&
@@ -162,7 +172,76 @@ class Game
 
     all_moves = [[-1, 0],[1, 0],[0, -1],[0, 1],[-1, -1],[-1, 1],[1, 1],[1, -1],
                 [-2, -1],[-2, 1],[-1, 2],[1, 2],[2, 1],[2, -1],[1, -2],[-1, 2]]
- 
+    a = 0 # index for "all_moves" array
+
+    # look for opposing king
+    until a > 7 do
+      move = all_moves[a]
+      i = y + move[0]
+      j = x + move[1]
+      unless i >= 0 && j >= 0 && i < 8 && j < 8
+        a += 1
+        next
+      end
+      if current_board[i][j] && current_board[i][j].name == "King"
+        return true
+      end
+      a += 1
+    end
+
+    # look horizontally and vertically for opposing rooks / queens
+    a = 0
+    until a > 3 do
+      move = all_moves[a]
+      i = move[0]
+      j = move[1]
+      while y + i >= 0 && x + j >= 0 && y + i < 8 && x + j < 8 do
+        if current_board[y + i][x + j] && current_board[y + i][x + j].color != color
+          if current_board[y + i][x + j].name == "Rook" || current_board[y + i][x + j].name == "Queen"
+            return true
+          end
+        end
+        break if current_board[y + i][x + j]
+        i += move[0]
+        j += move[1]
+      end
+      a += 1
+    end
+
+    # look at each diagonal path for opposing bishops / queens
+    until a > 7 do
+      move = all_moves[a]
+      i = move[0]
+      j = move[1]
+      while y + i >= 0 && x + j >= 0 && y + i < 8 && x + j < 8 do
+        if current_board[y + i][x + j] && current_board[y + i][x + j].color != color
+          if current_board[y + i][x + j].name == "Bishop" || current_board[y + i][x + j].name == "Queen"
+            return true
+          end
+        end
+        break if current_board[y + i][x + j]
+        i += move[0]
+        j += move[1]
+      end
+      a += 1
+    end
+
+    # look for threatening knights
+    until a > 15 do
+      move = all_moves[a]
+      i = y + move[0]
+      j = x + move[1]
+      unless i >= 0 && j >= 0 && i < 8 && j < 8
+        a += 1
+        next
+      end
+      if current_board[i][j] && current_board[i][j].name == "Knight" &&
+        current_board[i][j].color != color
+        return true
+      end
+      a += 1
+    end
+
     return false
   end
 
