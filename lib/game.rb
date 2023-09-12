@@ -130,6 +130,13 @@ class Game
           move_piece([start[0], 7], [finish[0], 5], current_board)
         end
       end
+    # check for en passant condition to delete out-of-place pawn
+    elsif current_board[start[0]][start[1]].name == "Pawn"
+      if start[1] + 1 == finish[1] || start[1] - 1 == finish[1]
+        if current_board[finish[0]][finish[1]].nil?
+          current_board[start[0]][finish[1]] = nil
+        end
+      end
     end
     current_board[finish[0]][finish[1]] = current_board[start[0]][start[1]]
     current_board[start[0]][start[1]] = nil
