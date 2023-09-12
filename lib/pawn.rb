@@ -39,12 +39,36 @@ class Pawn
           end
         end
       else
-        # add checks for en passant
-        next unless current_game.board[i][j] && current_game.board[i][j].color != @color
-        test_board = current_game.build_test_board
-        current_game.move_piece(position, [i, j], test_board)
-        unless current_game.king_in_check?(@color, test_board)
-          @possible_moves.push(current_game.array_to_coords([i, j]))
+        if current_game.board[i][j] && current_game.board[i][j].color != @color
+          test_board = current_game.build_test_board
+          current_game.move_piece(position, [i, j], test_board)
+          unless current_game.king_in_check?(@color, test_board)
+            @possible_moves.push(current_game.array_to_coords([i, j]))
+          end
+        end
+        # check en passant
+        next if current_game.move_log.length < 2
+        last_move = current_game.move_log[-1]
+        if last_move[2] == "Pawn"
+          if last_move[1][0] + 2 == last_move[0][0] || last_move[1][0] - 2 == last_move[0][0]
+            if @color == "white" && position[0] == 3
+              if last_move[1] == [3, j]
+                test_board = current_game.build_test_board
+                current_game.move_piece(position, [i, j], test_board)
+                unless current_game.king_in_check?(@color, test_board)
+                  @possible_moves.push(current_game.array_to_coords([i, j]))
+                end
+              end
+            elsif @color == "black" && position[0] == 4
+              if last_move[1] == [4, j]
+                test_board = current_game.build_test_board
+                current_game.move_piece(position, [i, j], test_board)
+                unless current_game.king_in_check?(@color, test_board)
+                  @possible_moves.push(current_game.array_to_coords([i, j]))
+                end
+              end
+            end
+          end
         end
       end
     end
