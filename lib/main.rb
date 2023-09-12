@@ -5,6 +5,7 @@ playing = 'F'
 puts "Welcome to Ruby Chess!"
 
 until playing == 'N' do
+  playing = "F"
   current_game = Game.new()
   puts "Please enter a name for player 1 (white): "
   name = gets.chomp
