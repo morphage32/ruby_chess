@@ -41,11 +41,25 @@ until playing == 'N' do
       start_array = current_game.coords_to_array(starting_coords)
       if start_array.length == 2
         selected_square = current_game.board[start_array[0]][start_array[1]]
+      elsif starting_coords == "save" || starting_coords == "resign"
+        if starting_coords == "save"
+          # serialize all game data, change endgame code, and BREAK
+          endgame = 6
+          playing = 'N'
+        else
+          if current_player == current_game.player1
+            endgame = 22
+          else
+            endgame = 11
+          end
+        end
+        puts
+        break
       end
       if selected_square && selected_square.color == current_player.color
         if selected_square.possible_moves.length > 0
           until finish_array.length == 2 || finishing_coords == "cancel"
-            puts "Please enter the letter and number of the square you would like to move your #{selected_square.name}. or type 'cancel' to select a another option: "
+            puts "Please enter the letter and number of the square you would like to move your #{selected_square.name}, or type 'cancel' to select a another option: "
             finishing_coords = gets.chomp.downcase
             if finishing_coords == "cancel"
               starting_coords = ""
@@ -67,6 +81,7 @@ until playing == 'N' do
         puts "Invalid selection, please try again."
       end
     end
+    break if endgame != 0
     current_game.move_piece(start_array, finish_array)
     current_game.move_log.push([start_array, finish_array, current_game.board[finish_array[0]][finish_array[1]].name])
     if current_game.board[finish_array[0]][finish_array[1]].first_move
@@ -116,13 +131,14 @@ until playing == 'N' do
     puts "The game has ended in a draw. Reason: Insufficient Material"
   when 6
     puts "Your game has been saved"
+    puts
   when 11
     puts "#{current_game.player1.name} has won the game! Reason: #{current_game.player2.name} has resigned"
   when 22
     puts "#{current_game.player2.name} has won the game! Reason: #{current_game.player1.name} has resigned"
   end
 
-  until playing == "Y" || playing == "N" do
+  until playing == "Y" || playing == "N" || endgame == 6 do
     puts "Would you like to start a new game? (Y for 'Yes', N for 'No'): "
     playing = gets.upcase.chomp
     playing = "F" unless playing == "Y" || playing == "N"
