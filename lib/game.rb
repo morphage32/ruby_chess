@@ -54,21 +54,21 @@ class Game
       else
         case i
         when 1
-          print " a "
+          print " 8 "
         when 3
-          print " b "
+          print " 7 "
         when 5
-          print " c "
+          print " 6 "
         when 7
-          print " d "
+          print " 5 "
         when 9
-          print " e "
+          print " 4 "
         when 11
-          print " f "
+          print " 3 "
         when 13
-          print " g "
+          print " 2 "
         when 15
-          print " h "
+          print " 1 "
         end
 
         @board[j].each do |slot|
@@ -84,7 +84,7 @@ class Game
       end
       i += 1
     end
-    puts "     1   2   3   4   5   6   7   8"
+    puts "     a   b   c   d   e   f   g   h"
   end
 
   def update_all_moves()
@@ -103,16 +103,18 @@ class Game
   end
 
   def array_to_coords(array)
-    array[0] = (array[0] + 97).chr
-    array[1] = (array[1] + 49).chr
-    return array.join
+    coords = [array[1], array[0]]
+    coords[0] = (coords[0] + 97).chr
+    coords[1] = (-(coords[1] - 7) + 49).chr
+    return coords.join
   end
 
   def coords_to_array(string)
     return [] unless string.length == 2
-    array = string.split("")
-    array[0] = (array[0].ord - 97)
-    array[1] = (array[1].to_i - 1)
+    coords = string.split("")
+    array = [coords[1], coords[0]]
+    array[0] = (8 - array[0].to_i)
+    array[1] = (array[1].ord - 97)
     if array[0] >= 0 && array[0] >= 0 && array[1] < 8 && array[1] < 8
       return array
     else
@@ -140,6 +142,19 @@ class Game
     end
     current_board[finish[0]][finish[1]] = current_board[start[0]][start[1]]
     current_board[start[0]][start[1]] = nil
+  end
+
+  def convert_pawn(piece, color, array) 
+    case piece
+    when "q"
+      @board[array[0]][array[1]] = Queen.new(color)
+    when "r"
+      @board[array[0]][array[1]] = Rook.new(color)
+    when "k"
+      @board[array[0]][array[1]] = Knight.new(color)
+    when "b"
+      @board[array[0]][array[1]] = Bishop.new(color)
+    end
   end
 
   def king_in_check?(color, current_board = @board, custom_position = nil)
@@ -178,7 +193,7 @@ class Game
     end
 
     all_moves = [[-1, 0],[1, 0],[0, -1],[0, 1],[-1, -1],[-1, 1],[1, 1],[1, -1],
-                [-2, -1],[-2, 1],[-1, 2],[1, 2],[2, 1],[2, -1],[1, -2],[-1, 2]]
+                [-2, -1],[-2, 1],[-1, 2],[1, 2],[2, 1],[2, -1],[1, -2],[-1, -2]]
     a = 0 # index for "all_moves" array
 
     # look for opposing king

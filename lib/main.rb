@@ -32,7 +32,10 @@ until playing == 'N' do
     finish_array = []
 
     until start_array.length == 2 && finish_array.length == 2 do
-      puts "It's #{current_player.name}'s turn! Enter the letter and number of the piece you would like to move: "
+      puts "It's #{current_player.name}'s turn!"
+      puts "Enter the letter and number of the piece you would like to move."
+      puts "Type 'save' to save the game and quit."
+      puts "Type 'resign' to forfeit the game."
       selected_square = nil
       starting_coords = gets.chomp.downcase
       start_array = current_game.coords_to_array(starting_coords)
@@ -42,7 +45,7 @@ until playing == 'N' do
       if selected_square && selected_square.color == current_player.color
         if selected_square.possible_moves.length > 0
           until finish_array.length == 2 || finishing_coords == "cancel"
-            puts "Please enter the letter and number of the square you would like to move your #{selected_square.name}, or type 'cancel' to select a another option: "
+            puts "Please enter the letter and number of the square you would like to move your #{selected_square.name}. or type 'cancel' to select a another option: "
             finishing_coords = gets.chomp.downcase
             if finishing_coords == "cancel"
               starting_coords = ""
@@ -71,6 +74,19 @@ until playing == 'N' do
     end
     if current_game.board[finish_array[0]][finish_array[1]].name == "King"
       current_player.king.position = [finish_array[0], finish_array[1]]
+    elsif current_game.board[finish_array[0]][finish_array[1]].name == "Pawn"
+      if finish_array[0] == 0 || finish_array[0] == 7
+        piece = ""
+        puts "Your Pawn has reached its final rank! Promote it to a new piece!"
+        puts "Enter 'q' for 'Queen','r' for 'Rook', 'k' for 'Knight', or 'b' for 'Bishop':"
+        until piece.length == 1 && (piece == 'q' || piece == 'r' || piece == 'k' || piece == 'b') do
+          piece = gets.downcase.chomp
+          unless piece == 'q' || piece == 'r' || piece == 'k' || piece == 'b'
+            puts "Invalid selection, please try again."
+          end
+        end
+        current_game.convert_pawn(piece, current_game.board[finish_array[0]][finish_array[1]].color, [finish_array[0], finish_array[1]])
+      end
     end
     if current_player.color == "white"
       current_player = current_game.player2
