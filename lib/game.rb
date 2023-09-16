@@ -28,6 +28,65 @@ class Game
     @player2
   end
 
+  def load_game(data)
+    i = 2
+    while i < data.length do
+      move = data[i].split("")
+      j = 0
+      while j < 4 do
+        move[j] = move[j].to_i
+        j += 1
+      end
+      start = [move[0], move[1]]
+      finish = [move[2], move[3]]
+      move_piece(start, finish)
+      @move_log.push([start, finish, @board[move[2]][move[3]].name])
+      if @board[move[2]][move[3]].first_move == true
+        @board[move[2]][move[3]].first_move = false
+      end
+      if @board[move[2]][move[3]].name == "King"
+        @board[move[2]][move[3]].position = [move[2], move[3]]
+      elsif move[4]
+        convert_pawn(move[4], @board[move[2]][move[3]].color, finish)
+      end
+      i += 1
+    end
+  end
+
+  def save_game()
+    save = File.open("lib/save.txt", "r+")
+
+    unless save.size == 0
+      saving = "F"
+      p1 = save.readline.chomp
+      p2 = save.readline.chomp
+      puts "You currently have a saved game. (#{p1} vs. #{p2})"
+      puts "Overwrite saved game? ('Y' for Yes, 'N' for No):"
+      until saving == "Y" do
+        saving = gets.upcase.chomp
+        if saving == "N"
+          save.close
+          return saving
+        end
+        unless saving == "Y"
+          puts "Invalid selection. Please try again."
+        end
+      end
+    end
+
+    save.truncate(0)
+    save.write("#{@player1.name}\n")
+    save.write("#{@player2.name}")
+
+    @move_log.each do |move|
+      save.write("\n#{move[0][0]}#{move[0][1]}#{move[1][0]}#{move[1][1]}")
+      if move[3]
+        save.write("#{move[3]}")
+      end
+    end
+    save.close
+  end
+
   def build_test_board()
     @test_board.clear
     i = 0
@@ -155,6 +214,7 @@ class Game
     when "b"
       @board[array[0]][array[1]] = Bishop.new(color)
     end
+    @move_log[-1].push(piece)
   end
 
   def king_in_check?(color, current_board = @board, custom_position = nil)
@@ -309,7 +369,6 @@ class Game
   # endgames still needed:
   # threefold-repetition (code 3)
   # insufficient mating material (code 5)
-  # forfeit (code 11 or 22)
 
     return 0
   end
