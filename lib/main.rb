@@ -9,6 +9,7 @@ until playing == 'N' do
   loading = "F"
   invalid = "Invalid selection, please try again."
   current_game = Game.new()
+  current_game.add_position("white")
   save = File.open("lib/save.txt", "r")
   data = save.readlines.map(&:chomp)
 
@@ -166,6 +167,7 @@ until playing == 'N' do
     current_game.print_board
     puts
     current_game.update_all_moves
+    current_game.add_position(current_player.color)
     endgame = current_game.endgame_check
     if current_game.king_in_check?(current_player.color) && endgame == 0
       puts "#{current_player.name}'s King is in check!"

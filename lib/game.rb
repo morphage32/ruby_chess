@@ -6,7 +6,7 @@ require_relative "rook.rb"
 require_relative "pawn.rb"
 
 class Game
-  attr_reader :board
+  attr_reader :board, :positions
   attr_accessor :move_log, :player1, :player2
 
   def initialize()
@@ -24,6 +24,7 @@ class Game
               King.new("white"),Bishop.new("white"),Knight.new("white"),Rook.new("white")]]
     @test_board = []
     @move_log = []
+    @positions = []
     @player1
     @player2
   end
@@ -203,6 +204,98 @@ class Game
     current_board[start[0]][start[1]] = nil
   end
 
+  def add_position(color)
+    string = ""
+    i = 0
+    j = 0
+    empty = 0
+
+    while i < 8 do
+      while j < 8 do
+        if @board[i][j].nil?
+          empty += 1
+        else
+          if empty > 0
+            string += empty.to_s
+            empty = 0
+          end
+          if @board[i][j].name == "Pawn" && @board[i][j].color == "white"
+            string += "P"
+          elsif @board[i][j].name == "Knight" && @board[i][j].color == "white"
+            string += "N"
+          elsif @board[i][j].name == "Bishop" && @board[i][j].color == "white"
+            string += "B"
+          elsif @board[i][j].name == "Rook" && @board[i][j].color == "white"
+            string += "R"
+          elsif @board[i][j].name == "Queen" && @board[i][j].color == "white"
+            string += "Q"
+          elsif @board[i][j].name == "King" && @board[i][j].color == "white"
+            string += "K"
+          elsif @board[i][j].name == "Pawn"
+            string += "p"
+          elsif @board[i][j].name == "Knight"
+            string += "n"
+          elsif @board[i][j].name == "Bishop"
+            string += "b"
+          elsif @board[i][j].name == "Rook"
+            string += "r"
+          elsif @board[i][j].name == "Queen"
+            string += "q"
+          else
+            string += "k"
+          end
+        end
+        j += 1
+      end
+      if empty > 0
+        string += empty.to_s
+        empty = 0
+      end
+      i += 1
+      j = 0
+      string += "/" unless i == 8
+    end
+
+    string += " "
+    string += color[0]
+    string += " "
+
+    if @board[7][4].first_move == true
+      if @board[7][7].first_move == true
+        string += "K"
+      end
+      if @board[7][0].first_move == true
+        string += "Q"
+      end
+    end
+    if @board[0][4].first_move == true
+      if @board[0][7].first_move == true
+        string += "k"
+      end
+      if @board[0][0].first_move == true
+        string += "q"
+      end
+    end
+
+    string += " "
+
+    unless @move_log.empty?
+      if @move_log[-1][2] == "Pawn"
+        if @move_log[-1][1][0] + 2 == @move_log[-1][0][0] || @move_log[-1][1][0] - 2 == @move_log[-1][0][0]
+          string += array_to_coords([(@move_log[-1][0][0] + @move_log[-1][1][0]) / 2, @move_log[-1][1][1]])
+        else
+          string += "--"
+        end
+      else
+        string += "--"
+      end
+    else
+      string += "--"
+    end
+
+    @positions.push(string)
+  end
+
   def convert_pawn(piece, color, array) 
     case piece
     when "q"
@@ -214,6 +307,7 @@ class Game
     when "b"
       @board[array[0]][array[1]] = Bishop.new(color)
     end
+    @board[array[0]][array[1]].first_move = false
     @move_log[-1].push(piece)
   end
 
@@ -365,10 +459,28 @@ class Game
       end
       player += 1
     end
-    
-  # endgames still needed:
-  # threefold-repetition (code 3)
-  # insufficient mating material (code 5)
+
+    if @positions.length > 4
+      i = 0
+      reps = 1
+      until i == @positions.length - 1 do
+        j = i + 1
+        until j == @positions.length do
+          if @positions[i] == @positions[j]
+            reps += 1
+          end
+          if reps == 3
+            return 3
+          end
+          j += 1
+        end
+        i += 1
+        reps = 1
+      end
+    end
+
+    # endgames still needed:
+    # insufficient mating material (code 5)
 
     return 0
   end
