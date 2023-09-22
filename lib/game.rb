@@ -260,19 +260,19 @@ class Game
     string += color[0]
     string += " "
 
-    if @board[7][4].first_move == true
-      if @board[7][7].first_move == true
+    if @board[7][4] && @board[7][4].first_move == true
+      if @board[7][7] && @board[7][7].first_move == true
         string += "K"
       end
-      if @board[7][0].first_move == true
+      if @board[7][0] && @board[7][0].first_move == true
         string += "Q"
       end
     end
-    if @board[0][4].first_move == true
-      if @board[0][7].first_move == true
+    if @board[0][4] && @board[0][4].first_move == true
+      if @board[0][7] && @board[0][7].first_move == true
         string += "k"
       end
-      if @board[0][0].first_move == true
+      if @board[0][0] && @board[0][0].first_move == true
         string += "q"
       end
     end
@@ -479,8 +479,71 @@ class Game
       end
     end
 
-    # endgames still needed:
-    # insufficient mating material (code 5)
+    i = 0
+    j = 0
+    white_pieces = []
+    black_pieces = []
+    possible_mate = false
+
+    until possible_mate || i > 7 do
+      while j < 8 do
+        if @board[i][j]
+          if @board[i][j].name == "Rook" || @board[i][j].name == "Queen" || 
+            @board[i][j].name == "Pawn"
+            possible_mate = true
+            break
+          else
+            piece = @board[i][j].name
+            if piece == "Bishop"
+              if i.even?
+                if j.even?
+                  piece += "w"
+                else
+                  piece += "b"
+                end
+              else
+                if j.even?
+                  piece += "w"
+                else
+                  piece += "b"
+                end
+              end
+            end
+          end
+          if @board[i][j].color == "white"
+            white_pieces.push(piece)
+          else
+            black_pieces.push(piece)
+          end
+        end
+        j += 1
+      end
+      i += 1
+      j = 0
+    end
+
+    unless possible_mate
+      if white_pieces.length < 3 && black_pieces.length < 3
+        return 5
+      else
+        if white_pieces.count("Knight") == 2
+          if black_pieces.length == 1
+            return 5
+          end
+        elsif black_pieces.count("Knight") == 2
+          if white_pieces.length == 1
+            return 5
+          end
+        end
+        if white_pieces.count("Knight") == 0 && black_pieces.count("Knight") == 0
+          if white_pieces.include?("Bishopw") || black_pieces.include?("Bishopw")
+            unless white_pieces.include?("Bishopb") || black_pieces.include?("Bishopb")
+              return 5
+            end
+          end
+        end
+      end
+    end
 
     return 0
   end

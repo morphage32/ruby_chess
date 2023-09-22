@@ -195,12 +195,8 @@ until playing == 'N' do
     puts "#{current_game.player2.name} has won the game! Reason: #{current_game.player1.name} has resigned"
   end
 
-  unless endgame == 6
-
-  end
-
   until playing == "Y" || playing == "N" || endgame == 6 do
-    puts "Would you like to start a new game? (Y for 'Yes', N for 'No'): "
+    puts "Would you like to play another game? (Y for 'Yes', N for 'No'): "
     playing = gets.upcase.chomp
     playing = "F" unless playing == "Y" || playing == "N"
   end
