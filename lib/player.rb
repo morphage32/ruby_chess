@@ -4,6 +4,5 @@ class Player
     @name = name
     @color = color
     @king = king
-    @previous_moves = []
   end
 end
